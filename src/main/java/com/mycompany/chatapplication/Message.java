@@ -56,6 +56,10 @@ public class Message {
         this.messageHash = createMessageHash();
     }
 
+    Message(int i, String string, String hi_Keegan_did_you_receive_the_payment) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
     // Checks if message ID is exactly 10 characters long
     public boolean checkMessageID() {
         return this.messageID != null && this.messageID.length() == 10;

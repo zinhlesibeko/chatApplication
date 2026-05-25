@@ -1,0 +1,43 @@
+# .github/workflows/ci.yml
+# ---------------------------------------------------------------
+# CI/CD Pipeline – QuickChat Application
+# Runs on every push and pull request to main / master.
+# Steps: checkout → set up JDK → build → test
+# ---------------------------------------------------------------
+
+name: Java CI with Maven
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Check out the repository code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Set up Java 17 (LTS) with Maven
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      # 3. Build the project and run all JUnit tests
+      - name: Build and Test with Maven
+        run: mvn --batch-mode clean test
+
+      # 4. (Optional) Publish test results as a GitHub check
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v4
+        if: always()   # run even if tests fail so we can see the report
+        with:
+          report_paths: '**/target/surefire-reports/TEST-*.xml'
+          
