@@ -39,15 +39,15 @@ package com.mycompany.chatapplication;
 import java.util.Random;
 
 public class Message {
-    
+ 
     private String messageID;
     private String messageHash;
     private String recipientNumber;
     private String messageContent;
     private int numMessagesSent;
     private String sendMessageChoice;
-
-    // Constructor initializes message with auto-generated ID and hash
+ 
+    // Constructor: initializes message with auto-generated ID and hash
     public Message(String recipientNumber, String messageContent) {
         this.recipientNumber = recipientNumber;
         this.messageContent = messageContent;
@@ -55,27 +55,31 @@ public class Message {
         this.messageID = generateMessageID();
         this.messageHash = createMessageHash();
     }
-
-    Message(int i, String string, String hi_Keegan_did_you_receive_the_payment) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
+ 
     // Checks if message ID is exactly 10 characters long
     public boolean checkMessageID() {
         return this.messageID != null && this.messageID.length() == 10;
     }
-
-    // Validates recipient cell number format (+27 and appropriate length)
+ 
+    /*
+     * FIX: Original code checked length() == 10 AND length() <= 13 simultaneously.
+     * A valid SA number like +27834557896 is 12 characters, so == 10 was always false.
+     * Corrected to: starts with "+27" AND length is 12 or 13 characters.
+     */
     public String checkRecipientCell() {
-        if (recipientNumber != null && recipientNumber.startsWith("+27") && 
-            recipientNumber.length() == 10 && recipientNumber.length() <= 13) {
+        if (recipientNumber != null
+                && recipientNumber.startsWith("+27")
+                && recipientNumber.length() >= 12
+                && recipientNumber.length() <= 13) {
             return "Cell phone number successfully captured.";
         } else {
-            return "Cell phone number is incorrectly formatted or does not contain an international code. Must be exactly 10 characters starting with +27 (e.g.,+2782123456).";
+            return "Cell phone number is incorrectly formatted or does not contain "
+                    + "an international code. Must start with +27 and be 12-13 characters "
+                    + "(e.g., +27834557896).";
         }
     }
-
-    // Auto-generates message hash: First 2 digits of ID + ":0:" + Last word of message
+ 
+    // Auto-generates message hash: First 2 digits of ID + ":0:" + Last word of message (uppercase)
     public String createMessageHash() {
         if (messageID == null || messageID.length() < 2) {
             return "00:0:ERROR";
@@ -84,65 +88,58 @@ public class Message {
         String lastWord = getLastWord(messageContent);
         return firstTwoDigits + ":0:" + lastWord.toUpperCase();
     }
-
-    // Helper method to extract the last word from a message
+ 
+    // Helper: extracts the last word from a message string
     private String getLastWord(String msg) {
         if (msg == null || msg.trim().isEmpty()) {
             return "EMPTY";
         }
-        String[] words = msg.trim().split(" ");
-        return words.length > 0 ? words[words.length - 1] : "MSG";
+        String[] words = msg.trim().split("\\s+");
+        return words[words.length - 1];
     }
-
-    // Processes user choice: Send, Discard, or Store
+ 
+    // Processes user action choice: 1=Send, 2=Discard, 3=Store
     public String sendMessage(String choice) {
         this.sendMessageChoice = choice;
         this.numMessagesSent++;
-        
-        switch (choice.toLowerCase()) {
-            case "send":
-            case "1":
-                return "Message successfully sent.";
-            case "discard":
-            case "2":
-                return "Press 0 to delete the message.";
-            case "store":
-            case "3":
-                return "Message successfully stored.";
-            default:
-                return "Invalid choice. Message discarded.";
-        }
+ 
+        return switch (choice) {
+            case "send", "1" -> "Message successfully sent.";
+            case "discard", "2" -> "Press 0 to delete the message.";
+            case "store", "3" -> "Message successfully stored.";
+            default -> "Invalid choice. Message discarded.";
+        };
     }
-
-    // Returns formatted string with all message details
+ 
+    // Returns a formatted string with all message details
     public String printMessages() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("-----------------------------\n");
-        sb.append("Message ID: ").append(messageID).append("\n");
-        sb.append("Message Hash: ").append(messageHash).append("\n");
-        sb.append("Recipient: ").append(recipientNumber).append("\n");
-        sb.append("Message: ").append(messageContent).append("\n");
-        sb.append("Status: ").append(sendMessageChoice != null ? sendMessageChoice : "Not processed").append("\n");
-        sb.append("-----------------------------");
-        return sb.toString();
+        return "-----------------------------\n"
+                + "Message ID:   " + messageID + "\n"
+                + "Message Hash: " + messageHash + "\n"
+                + "Recipient:    " + recipientNumber + "\n"
+                + "Message:      " + messageContent + "\n"
+                + "Status:       " + (sendMessageChoice != null ? sendMessageChoice : "Not processed") + "\n"
+                + "-----------------------------";
     }
-
-    // Returns total number of messages sent
+ 
+    // Returns the total number of messages sent
     public int returnTotalMessagesSent() {
         return this.numMessagesSent;
     }
-
+ 
     // Generates a random 10-digit unique message ID
     private String generateMessageID() {
         Random rand = new Random();
-        return String.format("%010d", rand.nextInt(1000000000));
+        return String.format("%010d", (long)(rand.nextDouble() * 9_000_000_000L) + 1_000_000_000L);
     }
-
-    // Getters and Setters
-    public String getMessageID() { return messageID; }
-    public String getMessageHash() { return messageHash; }
-    public String getRecipientNumber() { return recipientNumber; }
-    public String getMessageContent() { return messageContent; }
+ 
+    // Getters
+    public String getMessageID()         { return messageID; }
+    public String getMessageHash()       { return messageHash; }
+    public String getRecipientNumber()   { return recipientNumber; }
+    public String getMessageContent()    { return messageContent; }
     public String getSendMessageChoice() { return sendMessageChoice; }
+ 
+    // Setter
     public void setSendMessageChoice(String choice) { this.sendMessageChoice = choice; }
 }

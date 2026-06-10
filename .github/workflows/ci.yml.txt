@@ -40,4 +40,3 @@ jobs:
         if: always()   # run even if tests fail so we can see the report
         with:
           report_paths: '**/target/surefire-reports/TEST-*.xml'
-          
